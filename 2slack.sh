@@ -34,7 +34,7 @@ dependencies=(
 )
 
 for program in "${dependencies[@]}"; do
-    command -v $program >/dev/null 2>&1 || _die "${program} is not installed."
+    command -v "${program}" >/dev/null 2>&1 || _die "${program} is not installed."
 done
 
 read content
@@ -58,16 +58,13 @@ webhook_url=$(cat "${config_path}" | jq --raw-output .webhook)
 #Split string into array delimited by spaces
 IFS=' ' read -r -a options <<< "${content}"
 
-#Check if message is intended for a specific channel
+#Check if message is intended for a specific channel/user
 if [[ "${options[0]}" == \@*  ]] || [[ "${options[0]}" == \#*  ]]; then
     channel="${options[0]}"
     message="${options[@]:1}"
 else
     message="${options[@]}"
 fi
-
-#TODO: Investigate where or not I need to escape characters
-message_escaped=$(printf "%q" "$message")
 
 payload=$(cat << EOF
 {
@@ -78,5 +75,4 @@ payload=$(cat << EOF
 EOF
 )
 
-curl -s -X POST -H 'Content-type: application/json' --data "${payload}" "${webhook_url}" || _die "Failed to send message."
-
+curl -sS -X POST -H 'Content-type: application/json' --data "${payload}" "${webhook_url}" || _die "Failed to send message."
