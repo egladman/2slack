@@ -69,7 +69,7 @@ fi
 payload=$(cat << EOF
 {
   "channel": "${channel}",
-  "username": "$(hostname)",
+  "username": "$(whoami)-$(hostname)",
   "text": "${message}"
 }
 EOF
